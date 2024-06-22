@@ -11,7 +11,7 @@ const API_BASE_URL = 'https://cepnq6rjbk.execute-api.us-east-1.amazonaws.com/';
 export const ApiProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
 
-  // Función para registrar un nuevo usuario
+  // Función para registrar un nuevo usuarioñ
   const register = async (username, password, role) => {
     try {
       const response = await axios.post(`${API_BASE_URL}auth/register`, {
