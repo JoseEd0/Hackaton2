@@ -1,17 +1,13 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
-// Crear el contexto de la API
 const ApiContext = createContext();
 
-// URL base de la API
 const API_BASE_URL = 'https://cepnq6rjbk.execute-api.us-east-1.amazonaws.com/';
 
-// Proveedor del contexto
 export const ApiProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
 
-  // Función para registrar un nuevo usuarioñ
   const register = async (username, password, role) => {
     try {
       const response = await axios.post(`${API_BASE_URL}auth/register`, {
@@ -26,14 +22,13 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  // Función para iniciar sesión
   const login = async (username, password) => {
     try {
       const response = await axios.post(`${API_BASE_URL}auth/login`, {
         username,
         password,
       });
-      setAuthToken(response.data.token); // Guardar el token de autenticación
+      setAuthToken(response.data.token);
       return response.data;
     } catch (error) {
       console.error('Error al iniciar sesión', error);
@@ -41,7 +36,6 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  // Función para agregar un item al carrito
   const addToCart = async (itemId, userId) => {
     try {
       const response = await axios.post(
@@ -56,7 +50,6 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  // Función para obtener el carrito de un usuario
   const getCart = async (userId) => {
     try {
       const response = await axios.get(`${API_BASE_URL}cart/${userId}`, {
@@ -69,13 +62,11 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
-  // Exponer las funciones y estados a través del proveedor
   return (
-    <ApiContext.Provider value={{ register, login, addToCart, getCart }}>
+    <ApiContext.Provider value={{ register, login, addToCart, getCart, authToken, setAuthToken }}>
       {children}
     </ApiContext.Provider>
   );
 };
 
-// Hook personalizado para usar el contexto de la API
 export const useApi = () => useContext(ApiContext);
