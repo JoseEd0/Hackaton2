@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useApi } from './Api.jsx'; 
+import { useAuth } from "../AuthContext"; // Importa useAuth en lugar de useApi
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('client'); 
+  const [role, setRole] = useState('client');
+  const { register } = useAuth(); // Utiliza register de useAuth
 
   const handleSubmit = async (e) => {
     e.preventDefault();

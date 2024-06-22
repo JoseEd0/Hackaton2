@@ -8,7 +8,7 @@ const NavBar = () => {
     <nav>
         <ul className="navbar-list">
             <li>
-                <Link to='/'>Home</Link>
+                <Link to='/ '>Home</Link>
             </li>
             {!token ?(
             <>
@@ -17,6 +17,9 @@ const NavBar = () => {
             </li>
             <li>
                 <Link to='/register'>Register</Link>
+            </li>
+            <li>
+                <Link to='/home'>Home</Link>
             </li>
             </>
             ): (

@@ -1,47 +1,86 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios from 'axios';
 
-const ApiContext = createContext();
+export const ApiContext = React.createContext();
+
 
 const API_BASE_URL = 'https://cepnq6rjbk.execute-api.us-east-1.amazonaws.com/';
 
 export const ApiProvider = ({ children }) => {
   const [authToken, setAuthToken] = useState(null);
 
-  const register = async (username, password, role) => {
+  const fetchConfig = () => ({
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+
+  const createItem = async (itemData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}auth/register`, {
-        username,
-        password,
-        role,
-      });
+      const response = await axios.post(`${API_BASE_URL}item`, itemData, fetchConfig());
       return response.data;
     } catch (error) {
-      console.error('Error al registrar usuario', error);
+      console.error('Error al crear el item', error);
       throw error;
     }
   };
 
-  const login = async (username, password) => {
+  const editItem = async (itemData) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}auth/login`, {
-        username,
-        password,
-      });
-      setAuthToken(response.data.token);
+      const response = await axios.put(`${API_BASE_URL}item`, itemData, fetchConfig());
       return response.data;
     } catch (error) {
-      console.error('Error al iniciar sesión', error);
+      console.error('Error al editar el item', error);
+      throw error;
+    }
+  };
+
+  const deleteItem = async (itemId) => {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}item/${itemId}`, fetchConfig());
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar el item', error);
+      throw error;
+    }
+  };
+
+  const getItem = async (itemId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}item/${itemId}`, fetchConfig());
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener el item', error);
+      throw error;
+    }
+  };
+
+  const getItems = async (limit, lastKey = null) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}items`, {
+        params: { limit, lastKey },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener los items', error);
+      throw error;
+    }
+  };
+
+  const buyCart = async (userId) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}buy`, { userId }, fetchConfig());
+      return response.data;
+    } catch (error) {
+      console.error('Error al realizar la compra', error);
       throw error;
     }
   };
 
   const addToCart = async (itemId, userId) => {
     try {
-      const response = await axios.post(
+      const response = await axios.put(
         `${API_BASE_URL}cart`,
         { itemId, userId },
-        { headers: { Authorization: `Bearer ${authToken}` } }
+        fetchConfig()
       );
       return response.data;
     } catch (error) {
@@ -50,23 +89,60 @@ export const ApiProvider = ({ children }) => {
     }
   };
 
+  const removeFromCart = async (itemId, userId) => {
+    try {
+      const response = await axios.delete(`${API_BASE_URL}cart`, {
+        data: { itemId, userId },
+        ...fetchConfig(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar del carrito', error);
+      throw error;
+    }
+  };
+
   const getCart = async (userId) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}cart/${userId}`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
+      const response = await axios.get(`${API_BASE_URL}cart/${userId}`, fetchConfig());
       return response.data;
     } catch (error) {
       console.error('Error al obtener el carrito', error);
       throw error;
     }
   };
+  const checkoutCart = async () => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}checkout`, {}, fetchConfig());
+      return response.data;
+    } catch (error) {
+      console.error('Error al realizar el checkout', error);
+      throw error;
+    }
+  };
 
   return (
-    <ApiContext.Provider value={{ register, login, addToCart, getCart, authToken, setAuthToken }}>
+    <ApiContext.Provider
+      value={{
+        createItem,
+        editItem,
+        deleteItem,
+        getItem,
+        getItems,
+        buyCart,
+        addToCart,
+        removeFromCart,
+        getCart,
+        authToken,
+        checkoutCart,
+        setAuthToken,
+      }}
+    >
       {children}
     </ApiContext.Provider>
   );
 };
 
-export const useApi = () => useContext(ApiContext);
+export const  useAuth = () => {
+  return useContext(AuthContext);
+}

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { useAuth } from "../AuthContext";
-import { useApi } from './Api'; // Asegúrate de que la ruta de importación sea correcta
+import { useAuth } from "../AuthContext"; // Importa useAuth en lugar de useApi
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const {login: setAuthToken} = useAuth();
+  const { login } = useAuth(); // Utiliza login de useAuth
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {

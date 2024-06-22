@@ -1,38 +1,41 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '../AuthContext'; 
+import InfiniteScroll from './InfiniteScroll';
+import { useAuth } from '../AuthContext';
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
   const [lastKey, setLastKey] = useState(null);
-  const { authToken } = useAuth();
+  const { getItems, addToCart } = useAuth;
 
   const fetchProducts = async () => {
-    const response = await axios.get(`https://cepnq6rjbk.execute-api.us-east-1.amazonaws.com/items?limit=10&lastKey=${lastKey}`, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    });
-    setProducts([...products, ...response.data.items]);
-    setLastKey(response.data.lastKey);
+    const response = await getItems(10, lastKey);
+    setProducts(prevProducts => [...prevProducts, ...response.items]);
+    setLastKey(response.lastKey);
+  };
+
+  const handleAddToCart = async (itemId) => {
+    await addToCart(itemId);
+    alert('Producto añadido al carrito');
   };
 
   useEffect(() => {
     fetchProducts();
-  }, [lastKey]);
+  }, []);
 
   return (
-    <div>
-      {products.map((product) => (
-        <div key={product.ansi}>
-          <img src={product.imgUrl} alt={product.title} />
-          <h3>{product.title}</h3>
-          <p>${product.price}</p>
-          {/* Más detalles del producto */}
-        </div>
-      ))}
-      <button onClick={() => fetchProducts()}>Cargar más</button>
-    </div>
+    <InfiniteScroll loadMore={fetchProducts} hasMore={lastKey !== null} loader={<div>Cargando...</div>}>
+      <div>
+        {products.map((product) => (
+          <div key={product.id}>
+            <img src={product.imgUrl} alt={product.title} />
+            <h3>{product.title}</h3>
+            <p>${product.price}</p>
+            <p>Puntuación: {product.rating}</p>
+            <button onClick={() => handleAddToCart(product.id)}>Añadir al Carrito</button>
+          </div>
+        ))}
+      </div>
+    </InfiniteScroll>
   );
 };
 
